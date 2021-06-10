@@ -1,0 +1,13 @@
+<launch>
+  <include file="$(find sot_universal_robot)/launch/sot_params.launch"/>
+
+  <!-- Sot Controller configuration -->
+  <rosparam command="load"
+	    file="$(find sot_universal_robot)/config/sot_params.yaml"/>
+  <rosparam command="load" file="$(find sot_universal_robot)/config/controller.yaml" />
+  
+  <!-- Spawn sot controller -->
+  <node name="sot_controller_spawner"
+        pkg="controller_manager" type="spawner" output="screen"
+        args="sot_controller" />
+</launch>

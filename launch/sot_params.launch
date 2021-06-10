@@ -1,0 +1,15 @@
+<launch>
+    <!-- Load robot sot params. -->
+  <group ns="sot">
+    <rosparam param="state_vector_map">
+      ["shoulder_pan_joint", "shoulder_lift_joint", "elbow_joint",
+      "wrist_1_joint", "wrist_2_joint", "wrist_3_joint"]
+    </rosparam>
+  </group>
+  <group ns="sot_controller">
+    <rosparam param="joint_names">
+      ["shoulder_pan_joint", "shoulder_lift_joint", "elbow_joint",
+      "wrist_1_joint", "wrist_2_joint", "wrist_3_joint"]
+    </rosparam>
+  </group>
+</launch>
