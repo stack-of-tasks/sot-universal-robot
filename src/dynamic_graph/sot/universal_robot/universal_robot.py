@@ -15,22 +15,26 @@ class UniversalRobot(AbstractRobot):
     This class defines a UniversalRobot UR3, UR5, or UR10
     """
 
-    defaultFilename = "package://tiago_data/robots/tiago_steel.urdf"
+    defaultFilename = "package://sot_universal_robot/urdf/ur10.urdf"
 
-    def __init__(self, name, device=None, tracer=None):
+    def __init__(self, name, device=None, tracer=None, loadFromFile=False):
         self.OperationalPointsMap = {
             'wrist': 'wrist_3_joint',
             'gaze': 'wrist_3_joint',
         }
 
-        print("Using ROS parameter \"/robot_description\"")
         rosParamName = "/robot_description"
-        import rospy
-        if rosParamName not in rospy.get_param_names():
-            raise RuntimeError('"' + rosParamName + '" is not a ROS parameter.')
-        s = rospy.get_param(rosParamName)
-        self.loadModelFromString(s, rootJointType=None,
-                                 removeMimicJoints=True)
+        if loadFromFile:
+            print("Loading from file " + self.defaultFilename)
+            self.loadModelFromUrdf(self.defaultFilename, rootJointType=None)
+        else:
+            print("Using ROS parameter \"/robot_description\"")
+            import rospy
+            if rosParamName not in rospy.get_param_names():
+                raise RuntimeError('"' + rosParamName +
+                                   '" is not a ROS parameter.')
+            s = rospy.get_param(rosParamName)
+            self.loadModelFromString(s, rootJointType=None)
         AbstractRobot.__init__(self, name, tracer)
 
         # Create rigid body dynamics model and data (pinocchio)

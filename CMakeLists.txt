@@ -80,3 +80,8 @@ INSTALL(FILES
   config/controller.yaml
   config/sot_params.yaml
   DESTINATION share/${PROJECT_NAME}/config)
+
+# Install default URDF file
+INSTALL(FILES
+  urdf/ur10.urdf
+  DESTINATION share/${PROJECT_NAME}/urdf)
