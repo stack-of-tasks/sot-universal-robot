@@ -23,11 +23,45 @@
 // OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+#define ENABLE_RT_LOG
 #include "device.hh"
 #include <dynamic-graph/factory.h>
 #include <dynamic-graph/all-commands.h>
+#include <dynamic-graph/real-time-logger.h>
 
 #include <sot/core/debug.hh>
+
+// Return true if it saturates.
+inline bool saturateBounds(double &val, const double &lower,
+                           const double &upper) {
+  assert(lower <= upper);
+  if (val < lower) {
+    val = lower;
+    return true;
+  }
+  if (upper < val) {
+    val = upper;
+    return true;
+  }
+  return false;
+}
+
+#define CHECK_BOUNDS(val, lower, upper, what)                                  \
+  for (int i = 0; i < val.size(); ++i) {                                       \
+    double old = val(i);                                                       \
+    if (saturateBounds(val(i), lower(i), upper(i))) {                          \
+      dgRTLOG() << "Robot " what " bound violation at DoF " << i <<            \
+	": requested " << old << " but set " << val(i) << '\n';                \
+    }                                                                          \
+  }
+
+#ifdef VP_DEBUG
+class initLog {
+public:
+  initLog(void) { dynamicgraph::sot::DebugTrace::openFile(); }
+};
+initLog log_initiator;
+#endif //#ifdef VP_DEBUG
 
 const double SoTUniversalRobotDevice::TIMESTEP_DEFAULT = 0.001;
 
@@ -88,7 +122,7 @@ void SoTUniversalRobotDevice::setSensors(map<string,SensorValues> &SensorsIn)
 
     // Implements force recollection.
     const std::vector<double>& forcesIn = it->second.getValues();
-    assert (std::div(forcesIn.size(), 6).rem == 0);
+    assert (std::div((int)forcesIn.size(), 6).rem == 0);
     int K = (int)forcesIn.size() / 6;
     for(int i=0;i<K;++i)
     {
@@ -177,10 +211,7 @@ void SoTUniversalRobotDevice::getControl(map<string,ControlValues> &controlOut)
 
   // Integrate control
   increment(timestep_);
-  sotDEBUG (25) << "state = " << state_ << std::endl;
-  sotDEBUG (25) << "diff  = " << ((previousState_.size() == state_.size())?
-				  (state_ - previousState_) : state_ )
-		<< std::endl;
+  sotDEBUG (25) << "state = " << state_.transpose() << std::endl;
   previousState_ = state_;
 
   // Specify the joint values for the controller.
@@ -190,4 +221,47 @@ void SoTUniversalRobotDevice::getControl(map<string,ControlValues> &controlOut)
     anglesOut[i] = state_(i);
   controlOut["control"].setValues(anglesOut);
   sotDEBUGOUT(25) ;
+}
+
+void SoTUniversalRobotDevice::integrate(const double &dt)
+{
+  using dynamicgraph::Vector;
+  const Vector &controlIN = controlSIN.accessCopy();
+
+  if (sanityCheck_ && controlIN.hasNaN()) {
+    dgRTLOG() << "Device::integrate: Control has NaN values: " << '\n'
+              << controlIN.transpose() << '\n';
+    return;
+  }
+
+  if (controlInputType_ == dynamicgraph::sot::CONTROL_INPUT_NO_INTEGRATION) {
+    state_ = controlIN;
+    return;
+  }
+
+  if (vel_control_.size() == 0)
+    vel_control_ = Vector::Zero(controlIN.size());
+
+  if (controlInputType_ == dynamicgraph::sot::CONTROL_INPUT_TWO_INTEGRATION) {
+    // TODO check acceleration
+    // Position increment
+    vel_control_ = velocity_ + (0.5 * dt) * controlIN;
+    // Velocity integration.
+    velocity_ += controlIN * dt;
+  } else {
+    vel_control_ = controlIN;
+  }
+
+  // Velocity bounds check
+  if (sanityCheck_) {
+    CHECK_BOUNDS(velocity_, lowerVelocity_, upperVelocity_, "velocity");
+  }
+
+  // Position integration
+  state_ += vel_control_ * dt;
+
+  // Position bounds check
+  if (sanityCheck_) {
+    CHECK_BOUNDS(state_, lowerPosition_, upperPosition_, "position");
+  }
 }
