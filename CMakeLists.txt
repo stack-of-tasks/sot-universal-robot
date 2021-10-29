@@ -73,12 +73,14 @@ INSTALL(FILES package.xml DESTINATION share/${PROJECT_NAME})
 INSTALL(FILES
   launch/controller.launch
   launch/sot_params.launch
+  launch/sot_params.launch
   DESTINATION share/${PROJECT_NAME}/launch)
 
 # Install configuration files
 INSTALL(FILES
   config/controller.yaml
   config/sot_params.yaml
+  config/sot_params_simu.yaml
   DESTINATION share/${PROJECT_NAME}/config)
 
 # Install default URDF file

@@ -28,5 +28,5 @@ sot_controller:
       ros_control_mode: POSITION
       sot_control_mode: VELOCITY
 
-  dt: 0.002
+  dt: 0.01
   jitter: 0.004
