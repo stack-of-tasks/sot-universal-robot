@@ -9,4 +9,6 @@ BOOST_PYTHON_MODULE(wrap)
 
   dynamicgraph::python::exposeEntity<SoTRobotArmDevice,
     bp::bases<dg::sot::Device> >();
+  dynamicgraph::python::exposeEntity<DeviceToDynamic,
+    bp::bases<dg::Entity> >();
 }

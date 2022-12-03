@@ -25,6 +25,7 @@
 
 #define ENABLE_RT_LOG
 #include "device.hh"
+#include <dynamic-graph/entity.h>
 #include <dynamic-graph/factory.h>
 #include <dynamic-graph/all-commands.h>
 #include <dynamic-graph/real-time-logger.h>
@@ -268,3 +269,5 @@ void SoTRobotArmDevice::integrate(const double &dt)
     CHECK_BOUNDS(state_, lowerPosition_, upperPosition_, "position");
   }
 }
+
+DYNAMICGRAPH_FACTORY_ENTITY_PLUGIN(DeviceToDynamic, "DeviceToDynamic");

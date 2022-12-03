@@ -79,6 +79,7 @@ INSTALL(FILES
 INSTALL(FILES
   config/sot_params_common.yaml
   config/sot_params_ur.yaml
+  config/sot_params_franka_panda.yaml
   DESTINATION share/${PROJECT_NAME}/config)
 
 # Install default URDF file

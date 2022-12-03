@@ -42,6 +42,7 @@ DYNAMIC_GRAPH_PYTHON_MODULE("sot/robot_arm/${PYTHON_LIBRARY_NAME}"
 # Install Python files.
 SET(PYTHON_MODULE dynamic_graph/sot/robot_arm)
 PYTHON_INSTALL_ON_SITE("${PYTHON_MODULE}" "__init__.py")
+PYTHON_INSTALL_ON_SITE("${PYTHON_MODULE}" "franka.py")
 PYTHON_INSTALL_ON_SITE("${PYTHON_MODULE}" "prologue.py")
 PYTHON_INSTALL_ON_SITE("${PYTHON_MODULE}" "robot_arm.py")
 PYTHON_INSTALL_ON_SITE("${PYTHON_MODULE}" "universal_robot.py")
