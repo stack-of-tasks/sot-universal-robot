@@ -36,7 +36,7 @@ using dynamicgraph::sot::Device;
 using dynamicgraph::sot::ControlValues;
 using dynamicgraph::sot::SensorValues;
 
-class SoTUniversalRobotDevice : public dynamicgraph::sot::Device
+class SoTRobotArmDevice : public dynamicgraph::sot::Device
 {
 public:
   static const std::string CLASS_NAME;
@@ -47,8 +47,8 @@ public:
     return CLASS_NAME;
   }
 
-  SoTUniversalRobotDevice(std::string RobotName);
-  virtual ~SoTUniversalRobotDevice();
+  SoTRobotArmDevice(std::string RobotName);
+  virtual ~SoTRobotArmDevice();
 
   void setSensors(std::map<std::string,SensorValues> &sensorsIn);
 
@@ -94,6 +94,6 @@ protected:
   dynamicgraph::Vector torques_;
   dynamicgraph::Vector p_gains_;
   dynamicgraph::Vector d_gains_;
-}; // class SoTUniversalRobotDevice
+}; // class SoTRobotArmDevice
 
 #endif // SOT_UNIVERSAL_ROBOT_DEVICE_HH

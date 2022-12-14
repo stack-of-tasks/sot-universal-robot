@@ -63,12 +63,12 @@ public:
 initLog log_initiator;
 #endif //#ifdef VP_DEBUG
 
-const double SoTUniversalRobotDevice::TIMESTEP_DEFAULT = 0.001;
+const double SoTRobotArmDevice::TIMESTEP_DEFAULT = 0.001;
 
-DYNAMICGRAPH_FACTORY_ENTITY_PLUGIN(SoTUniversalRobotDevice,
-				   "DeviceUniversalRobot");
+DYNAMICGRAPH_FACTORY_ENTITY_PLUGIN(SoTRobotArmDevice,
+				   "DeviceRobotArm");
 
-SoTUniversalRobotDevice::SoTUniversalRobotDevice(std::string RobotName):
+SoTRobotArmDevice::SoTRobotArmDevice(std::string RobotName):
   Device(RobotName),
   closedLoop_ (false),
   previousState_ (),
@@ -101,15 +101,15 @@ SoTUniversalRobotDevice::SoTUniversalRobotDevice(std::string RobotName):
       "\n";
   addCommand("setClosedLoop",
              makeCommandVoid1(*this,
-                              &SoTUniversalRobotDevice::setClosedLoop,
+                              &SoTRobotArmDevice::setClosedLoop,
 			      docstring));
   sotDEBUGOUT(25);
 }
 
-SoTUniversalRobotDevice::~SoTUniversalRobotDevice()
+SoTRobotArmDevice::~SoTRobotArmDevice()
 { }
 
-void SoTUniversalRobotDevice::setSensors(map<string,SensorValues> &SensorsIn)
+void SoTRobotArmDevice::setSensors(map<string,SensorValues> &SensorsIn)
 {
   sotDEBUGIN(25) ;
   map<string,SensorValues>::iterator it;
@@ -184,27 +184,30 @@ void SoTUniversalRobotDevice::setSensors(map<string,SensorValues> &SensorsIn)
   sotDEBUGOUT(25);
 }
 
-void SoTUniversalRobotDevice::setupSetSensors(map<string,SensorValues>&
+void SoTRobotArmDevice::setupSetSensors(map<string,SensorValues>&
 					      SensorsIn)
 {
   setSensors (SensorsIn);
-  setState (robotState_);
+  // Robot state might be smaller than state in case there is a gripper
+  // with mimic joints.
+  state_.head(robotState_.accessCopy().size()) = robotState_.accessCopy();
+  stateSOUT.setConstant(state_);
 }
 
-void SoTUniversalRobotDevice::nominalSetSensors(map<string,SensorValues>&
+void SoTRobotArmDevice::nominalSetSensors(map<string,SensorValues>&
 						SensorsIn)
 {
   setSensors (SensorsIn);
 }
 
 
-void SoTUniversalRobotDevice::cleanupSetSensors(map<string, SensorValues>&
+void SoTRobotArmDevice::cleanupSetSensors(map<string, SensorValues>&
 						SensorsIn)
 {
   setSensors (SensorsIn);
 }
 
-void SoTUniversalRobotDevice::getControl(map<string,ControlValues> &controlOut)
+void SoTRobotArmDevice::getControl(map<string,ControlValues> &controlOut)
 {
   sotDEBUGIN(25) ;
   std::vector<double> anglesOut;
@@ -223,7 +226,7 @@ void SoTUniversalRobotDevice::getControl(map<string,ControlValues> &controlOut)
   sotDEBUGOUT(25) ;
 }
 
-void SoTUniversalRobotDevice::integrate(const double &dt)
+void SoTRobotArmDevice::integrate(const double &dt)
 {
   using dynamicgraph::Vector;
   const Vector &controlIN = controlSIN.accessCopy();

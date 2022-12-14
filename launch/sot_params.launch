@@ -1,15 +1,19 @@
 <launch>
+  <arg name="simulation" default="false"/>
+  <arg name="robot" default="" />
+  <arg name="arm_id" default="panda"/>
     <!-- Load robot sot params. -->
-  <group ns="sot">
-    <rosparam param="state_vector_map">
-      ["shoulder_pan_joint", "shoulder_lift_joint", "elbow_joint",
-      "wrist_1_joint", "wrist_2_joint", "wrist_3_joint"]
-    </rosparam>
-  </group>
-  <group ns="sot_controller">
-    <rosparam param="joint_names">
-      ["shoulder_pan_joint", "shoulder_lift_joint", "elbow_joint",
-      "wrist_1_joint", "wrist_2_joint", "wrist_3_joint"]
-    </rosparam>
-  </group>
+    <group ns="sot_controller" if="$(eval robot == 'ur')">
+      <rosparam param="dt" if="$(arg simulation)">
+        0.002
+      </rosparam>
+      <rosparam param="dt" unless="$(arg simulation)">
+        0.01
+      </rosparam>
+    </group>
+    <!-- Sot Controller configuration -->
+    <rosparam command="load"
+              file="$(find sot_universal_robot)/config/sot_params_common.yaml"/>
+    <rosparam command="load" if="$(eval robot == 'ur')"
+              file="$(find sot_universal_robot)/config/sot_params_ur.yaml"/>
 </launch>

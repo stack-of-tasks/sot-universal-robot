@@ -1,13 +1,4 @@
 sot_controller:
-  libname: libsot-universal-robot-controller.so
-  map_rc_to_sot_device:
-    motor-angles: motor-angles
-    joint-angles: joint-angles
-    velocities: velocities
-    forces: forces
-    torques: torques
-    control: control
-
   control_mode:
     shoulder_pan_joint:
       ros_control_mode: POSITION
@@ -28,5 +19,14 @@ sot_controller:
       ros_control_mode: POSITION
       sot_control_mode: VELOCITY
 
-  dt: 0.01
-  jitter: 0.004
+  joint_names:
+    [shoulder_pan_joint, shoulder_lift_joint, elbow_joint, wrist_1_joint,
+    wrist_2_joint, wrist_3_joint]
+  joints:
+    [shoulder_pan_joint, shoulder_lift_joint, elbow_joint, wrist_1_joint,
+    wrist_2_joint, wrist_3_joint]
+
+sot:
+  state_vector_map:
+    [shoulder_pan_joint, shoulder_lift_joint, elbow_joint, wrist_1_joint,
+    wrist_2_joint, wrist_3_joint]

@@ -1,0 +1,16 @@
+sot_controller:
+  libname: libsot-robot-arm-controller.so
+  map_rc_to_sot_device:
+    motor-angles: motor-angles
+    joint-angles: joint-angles
+    velocities: velocities
+    forces: forces
+    torques: torques
+    control: control
+
+  type:
+    sot_controller/RCSotController
+  check_mode:
+    False
+  verbosity_level:
+    25

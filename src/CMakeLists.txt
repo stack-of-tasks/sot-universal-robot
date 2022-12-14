@@ -25,7 +25,7 @@
 
 # Add the library to wrap the device of Tiago.
 
-SET(DEVICE_NAME sot-universal-robot-device)
+SET(DEVICE_NAME sot-robot-arm-device)
 ADD_LIBRARY(${DEVICE_NAME} SHARED device.cc)
 
 # Link the dynamic library containing the SoT with its dependencies.
@@ -35,18 +35,19 @@ INSTALL(TARGETS ${DEVICE_NAME} EXPORT ${TARGETS_EXPORT_NAME} DESTINATION lib)
 
 # build python submodule
 STRING(REPLACE - _ PYTHON_LIBRARY_NAME ${DEVICE_NAME})
-DYNAMIC_GRAPH_PYTHON_MODULE("sot/universal_robot/${PYTHON_LIBRARY_NAME}"
-  ${DEVICE_NAME} sot_universal_robot-${PYTHON_LIBRARY_NAME}-wrap
+DYNAMIC_GRAPH_PYTHON_MODULE("sot/robot_arm/${PYTHON_LIBRARY_NAME}"
+  ${DEVICE_NAME} sot_robot_arm-${PYTHON_LIBRARY_NAME}-wrap
   SOURCE_PYTHON_MODULE ${CMAKE_CURRENT_SOURCE_DIR}/device-python.cc)
 
 # Install Python files.
-SET(PYTHON_MODULE dynamic_graph/sot/universal_robot)
+SET(PYTHON_MODULE dynamic_graph/sot/robot_arm)
 PYTHON_INSTALL_ON_SITE("${PYTHON_MODULE}" "__init__.py")
-PYTHON_INSTALL_ON_SITE("${PYTHON_MODULE}" "universal_robot.py")
 PYTHON_INSTALL_ON_SITE("${PYTHON_MODULE}" "prologue.py")
+PYTHON_INSTALL_ON_SITE("${PYTHON_MODULE}" "robot_arm.py")
+PYTHON_INSTALL_ON_SITE("${PYTHON_MODULE}" "universal_robot.py")
 
-# Add the library to wrap the controller of Universal-Robot.
-SET(CONTROLLER_NAME sot-universal-robot-controller)
+# Add the library to wrap the controller of Robot-Arm.
+SET(CONTROLLER_NAME sot-robot-arm-controller)
 ADD_LIBRARY(${CONTROLLER_NAME} SHARED
   controller.cc
   controller.hh
@@ -54,6 +55,6 @@ ADD_LIBRARY(${CONTROLLER_NAME} SHARED
 
 # Link the dynamic library containing the SoT with its dependencies.
 TARGET_LINK_LIBRARIES(${CONTROLLER_NAME} sot-core::sot-core dynamic-graph-python::dynamic-graph-python
-    dynamic_graph_bridge::ros_bridge dynamic_graph_bridge::ros_interpreter sot-universal-robot-device)
+    dynamic_graph_bridge::ros_bridge dynamic_graph_bridge::ros_interpreter sot-robot-arm-device)
 
 INSTALL(TARGETS ${CONTROLLER_NAME} EXPORT ${TARGETS_EXPORT_NAME} DESTINATION lib)

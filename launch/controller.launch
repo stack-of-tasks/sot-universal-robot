@@ -1,15 +1,10 @@
 <launch>
   <arg name="simulation" default="false"/>
-  <include file="$(find sot_universal_robot)/launch/sot_params.launch"/>
-
-  <!-- Sot Controller configuration -->
-  <rosparam command="load" unless="$(arg simulation)"
-	    file="$(find sot_universal_robot)/config/sot_params.yaml"/>
-  <rosparam command="load" if="$(arg simulation)"
-	    file="$(find sot_universal_robot)/config/sot_params_simu.yaml"/>
-  <rosparam command="load"
-	    file="$(find sot_universal_robot)/config/controller.yaml" />
-  
+  <arg name="robot" default="" />
+  <include file="$(find sot_universal_robot)/launch/sot_params.launch">
+    <arg name="robot" value="$(arg robot)"/>
+    <arg name="simulation" value="$(arg simulation)"/>
+  </include>
   <!-- Spawn sot controller -->
   <node name="sot_controller_spawner"
         pkg="controller_manager" type="spawner" output="screen"
