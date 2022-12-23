@@ -29,7 +29,7 @@
 #include <sot/core/fwd.hh>
 #include <sot/core/abstract-sot-external-interface.hh>
 
-class SoTUniversalRobotDevice;
+class SoTRobotArmDevice;
 
 using std::string;
 using std::map;
@@ -40,16 +40,16 @@ using dynamicgraph::sot::ControlValues;
 using dynamicgraph::sot::SensorValues;
 
 
-class SoTUniversalRobotController: public AbstractSotExternalInterface
+class SoTRobotArmController: public AbstractSotExternalInterface
 {
  public:
 
   static const string LOG_PYTHON;
 
-  SoTUniversalRobotController();
-  SoTUniversalRobotController(const char robotName[]);
-  SoTUniversalRobotController(string robotName);
-  virtual ~SoTUniversalRobotController();
+  SoTRobotArmController();
+  SoTRobotArmController(const char robotName[]);
+  SoTRobotArmController(string robotName);
+  virtual ~SoTRobotArmController();
 
   void setupSetSensors(map<string,SensorValues> &sensorsIn);
 
@@ -74,11 +74,11 @@ class SoTUniversalRobotController: public AbstractSotExternalInterface
 		 const string& command,
 		 dynamicgraph::Interpreter& interpreter);
 
-  virtual void startupPython();
+  void startupPython(const std::string& robotType);
 
   void init();
 
-  SoTUniversalRobotDevice* device_;
-}; // class SoTUniversalRobotController
+  SoTRobotArmDevice* device_;
+}; // class SoTRobotArmController
 
 #endif // SOT_UNIVERSAL_ROBOT_CONTROLLER_HH

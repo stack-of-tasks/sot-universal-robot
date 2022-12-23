@@ -7,6 +7,8 @@ BOOST_PYTHON_MODULE(wrap)
 {
   bp::import("dynamic_graph.sot.core.wrap");
 
-  dynamicgraph::python::exposeEntity<SoTUniversalRobotDevice,
+  dynamicgraph::python::exposeEntity<SoTRobotArmDevice,
     bp::bases<dg::sot::Device> >();
+  dynamicgraph::python::exposeEntity<DeviceToDynamic,
+    bp::bases<dg::Entity> >();
 }

@@ -36,7 +36,7 @@ using dynamicgraph::sot::Device;
 using dynamicgraph::sot::ControlValues;
 using dynamicgraph::sot::SensorValues;
 
-class SoTUniversalRobotDevice : public dynamicgraph::sot::Device
+class SoTRobotArmDevice : public dynamicgraph::sot::Device
 {
 public:
   static const std::string CLASS_NAME;
@@ -47,8 +47,8 @@ public:
     return CLASS_NAME;
   }
 
-  SoTUniversalRobotDevice(std::string RobotName);
-  virtual ~SoTUniversalRobotDevice();
+  SoTRobotArmDevice(std::string RobotName);
+  virtual ~SoTRobotArmDevice();
 
   void setSensors(std::map<std::string,SensorValues> &sensorsIn);
 
@@ -94,6 +94,33 @@ protected:
   dynamicgraph::Vector torques_;
   dynamicgraph::Vector p_gains_;
   dynamicgraph::Vector d_gains_;
-}; // class SoTUniversalRobotDevice
+}; // class SoTRobotArmDevice
+
+/// Entity that converts a vector of dimension 7 to a vector of dimension 8
+///
+/// Useful for Franka robot where device.state is of dimension 7 while
+/// dynamic.position expects a vector of dimension 8.
+/// The last component is set to 0
+class DeviceToDynamic : public dynamicgraph::Entity
+{
+public:
+  static const std::string CLASS_NAME;
+  DeviceToDynamic(const std::string& name) :
+    dynamicgraph::Entity(name), sinSIN(0x0, "DeviceToDynamic("+name+")::input(vector)::sin"),
+    soutSOUT(boost::bind(&DeviceToDynamic::compute, this, _1, _2),
+             sinSIN, "DeviceToDynamic("+name+")::ouput(vector)::sout")
+  {
+    signalRegistration(sinSIN << soutSOUT);
+  }
+private:
+  dynamicgraph::Vector& compute(dynamicgraph::Vector& res, int time)
+  {
+    res.head<7>() = sinSIN(time);
+    res[7] = 0;
+    return res;
+  }
+  dynamicgraph::SignalPtr<dynamicgraph::Vector, int> sinSIN;
+  dynamicgraph::SignalTimeDependent<dynamicgraph::Vector, int> soutSOUT;
+};
 
 #endif // SOT_UNIVERSAL_ROBOT_DEVICE_HH

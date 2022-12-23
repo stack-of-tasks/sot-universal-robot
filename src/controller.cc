@@ -36,8 +36,8 @@
 
 #include "device.hh"
 
-const std::string SoTUniversalRobotController::LOG_PYTHON
-("/tmp/UniversalRobotController_python.out");
+const std::string SoTRobotArmController::LOG_PYTHON
+("/tmp/RobotArmController_python.out");
 
 using std::cout;
 using std::endl;
@@ -47,7 +47,7 @@ boost::condition_variable cond;
 boost::mutex mut;
 bool data_ready;
 
-void workThread(SoTUniversalRobotController *controller)
+void workThread(SoTRobotArmController *controller)
 {
 
   dynamicgraph::Interpreter aLocalInterpreter(dynamicgraph::rosInit(false,true));
@@ -63,88 +63,92 @@ void workThread(SoTUniversalRobotController *controller)
   ros::waitForShutdown();
 }
 
-SoTUniversalRobotController::SoTUniversalRobotController():
-  device_(new SoTUniversalRobotDevice("UniversalRobot"))
+SoTRobotArmController::SoTRobotArmController():
+  device_(new SoTRobotArmDevice("RobotArm"))
 {
   // Create thread and python interpreter
   init();
+  std::string robotType("ur");
   ros::NodeHandle nh;
   /// Read /sot_controller/dt to know what is the control period
   if (nh.hasParam("/sot_controller/dt")) {
     double dt;
     nh.getParam("/sot_controller/dt", dt);
     device_->setTimeStep(dt);
-    ROS_INFO_STREAM("Set Universal Robot control period to: " << dt);
+    ROS_INFO_STREAM("Set control period to: " << dt);
+    if (nh.hasParam("/sot/robot")){
+      nh.getParam("/sot/robot", robotType);
+    }
   }
-  startupPython();
+  startupPython(robotType);
   interpreter_->startRosService ();
 }
 
-SoTUniversalRobotController::SoTUniversalRobotController(std::string RobotName):
-  device_(new SoTUniversalRobotDevice (RobotName))
+SoTRobotArmController::SoTRobotArmController(std::string RobotName):
+  device_(new SoTRobotArmDevice (RobotName))
 {
   // Create thread and python interpreter
   init();
 }
 
-SoTUniversalRobotController::SoTUniversalRobotController(const char robotName[]):
-  device_(new SoTUniversalRobotDevice (robotName))
+SoTRobotArmController::SoTRobotArmController(const char robotName[]):
+  device_(new SoTRobotArmDevice (robotName))
 {
   // Create thread and python interpreter
   init();
 }
 
-void SoTUniversalRobotController::init()
+void SoTRobotArmController::init()
 {
-  cout << "Going through SoTUniversalRobotController." << endl;
+  cout << "Going through SoTRobotArmController." << endl;
   boost::thread thr(workThread,this);
   boost::unique_lock<boost::mutex> lock(mut);
   cond.wait(lock);
 }
 
-SoTUniversalRobotController::~SoTUniversalRobotController()
+SoTRobotArmController::~SoTRobotArmController()
 {
 }
 
-void SoTUniversalRobotController::setupSetSensors
+void SoTRobotArmController::setupSetSensors
 (map<string,SensorValues> &SensorsIn)
 {
   device_->setupSetSensors(SensorsIn);
 }
 
 
-void SoTUniversalRobotController::nominalSetSensors
+void SoTRobotArmController::nominalSetSensors
 (map<string,SensorValues> &SensorsIn)
 {
   device_->nominalSetSensors(SensorsIn);
 }
 
-void SoTUniversalRobotController::cleanupSetSensors
+void SoTRobotArmController::cleanupSetSensors
 (map<string, SensorValues> &SensorsIn)
 {
   device_->cleanupSetSensors(SensorsIn);
 }
 
 
-void SoTUniversalRobotController::getControl
+void SoTRobotArmController::getControl
 (map<string,ControlValues> &controlOut)
 {
   device_->getControl(controlOut);
 }
 
-void SoTUniversalRobotController::
+void SoTRobotArmController::
 setNoIntegration(void)
 {
   device_->setNoIntegration();
 }
 
-void SoTUniversalRobotController::
+void SoTRobotArmController::
 setSecondOrderIntegration(void)
 {
   device_->setSecondOrderIntegration();
 }
 
-void SoTUniversalRobotController::
+void SoTRobotArmController::
 runPython(std::ostream& file,
 	  const std::string& command,
 	  dynamicgraph::Interpreter& interpreter)
@@ -165,7 +169,7 @@ runPython(std::ostream& file,
   }
 }
 
-void SoTUniversalRobotController::startupPython()
+void SoTRobotArmController::startupPython(const std::string& robotType)
 {
   std::ofstream aof(LOG_PYTHON.c_str());
   runPython (aof, "import sys, os", *interpreter_);
@@ -177,10 +181,12 @@ void SoTUniversalRobotController::startupPython()
 	     "    path.append(p)", *interpreter_);
   runPython (aof, "path.extend(sys.path)", *interpreter_);
   runPython (aof, "sys.path = path", *interpreter_);
-  runPython (aof, "import dynamic_graph.sot.universal_robot.prologue",
+  runPython (aof, "import dynamic_graph.sot.robot_arm.prologue",
 	     *interpreter_);
-  runPython (aof, "robot = dynamic_graph.sot.universal_robot.prologue.makeRobot ()",
-	     *interpreter_);
+  std::ostringstream os;
+  os << "robot = dynamic_graph.sot.robot_arm.prologue.makeRobot"
+    " (robotType='" << robotType << "')";
+  runPython (aof, os.str(), *interpreter_);
 
   // Calling again rosInit here to start the spinner. It will
   // deal with topics and services callbacks in a separate, non
@@ -194,7 +200,7 @@ extern "C"
 {
   AbstractSotExternalInterface * createSotExternalInterface()
   {
-    return new SoTUniversalRobotController ();
+    return new SoTRobotArmController ();
   }
 }
 
