@@ -5,18 +5,18 @@
     <!-- Load robot sot params. -->
     <group ns="sot_controller" if="$(eval robot == 'ur')">
       <rosparam param="dt" if="$(arg simulation)">
-        0.002
+        0.01
       </rosparam>
       <rosparam param="dt" unless="$(arg simulation)">
-        0.01
+        0.002
       </rosparam>
     </group>
     <group ns="sot_controller" if="$(eval robot == 'franka')">
       <rosparam param="dt" if="$(arg simulation)">
-        0.001
+        0.01
       </rosparam>
       <rosparam param="dt" unless="$(arg simulation)">
-        0.01
+        0.001
       </rosparam>
     </group>
     <!-- Sot Controller configuration -->
