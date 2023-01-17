@@ -23,7 +23,7 @@
     <rosparam command="load"
               file="$(find sot_universal_robot)/config/sot_params_common.yaml"/>
     <rosparam command="load" if="$(eval robot == 'franka')"
-              file="$(find sot_universal_robot)/config/sot_params_franka_$(arg arm_id).yaml"
+              file="$(find sot_universal_robot)/config/sot_params_franka_panda.yaml"
               subst_value="true"/>
     <rosparam command="load" if="$(eval robot == 'ur')"
               file="$(find sot_universal_robot)/config/sot_params_ur.yaml"/>

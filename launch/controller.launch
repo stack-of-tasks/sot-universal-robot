@@ -1,7 +1,10 @@
 <launch>
   <arg name="simulation" default="false"/>
   <arg name="robot" default="" />
+  <arg name="arm_id" default=""
+       doc="prefix of the arm in case of multi-robot"/>
   <include file="$(find sot_universal_robot)/launch/sot_params.launch">
+    <arg name="arm_id" value="$(arg arm_id)"/>
     <arg name="robot" value="$(arg robot)"/>
     <arg name="simulation" value="$(arg simulation)"/>
   </include>

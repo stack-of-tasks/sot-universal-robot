@@ -1,24 +1,24 @@
 sot_controller:
   control_mode:
-    panda_joint1:
+    $(arg arm_id)_joint1:
       ros_control_mode: POSITION
       sot_control_mode: VELOCITY
-    panda_joint2:
+    $(arg arm_id)_joint2:
       ros_control_mode: POSITION
       sot_control_mode: VELOCITY
-    panda_joint3:
+    $(arg arm_id)_joint3:
       ros_control_mode: POSITION
       sot_control_mode: VELOCITY
-    panda_joint4:
+    $(arg arm_id)_joint4:
       ros_control_mode: POSITION
       sot_control_mode: VELOCITY
-    panda_joint5:
+    $(arg arm_id)_joint5:
       ros_control_mode: POSITION
       sot_control_mode: VELOCITY
-    panda_joint6:
+    $(arg arm_id)_joint6:
       ros_control_mode: POSITION
       sot_control_mode: VELOCITY
-    panda_joint7:
+    $(arg arm_id)_joint7:
       ros_control_mode: POSITION
       sot_control_mode: VELOCITY
 
