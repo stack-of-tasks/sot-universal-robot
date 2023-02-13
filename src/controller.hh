@@ -57,7 +57,7 @@ class SoTRobotArmController: public AbstractSotExternalInterface
 
   void cleanupSetSensors(map<string, SensorValues> &sensorsIn);
 
-  void getControl(map<string, ControlValues> &anglesOut);
+  void getControl(map<string, ControlValues> &anglesOut, const double& period);
 
   void setNoIntegration(void);
   void setSecondOrderIntegration(void);

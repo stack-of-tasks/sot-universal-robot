@@ -58,7 +58,7 @@ public:
 
   void cleanupSetSensors(std::map<std::string, SensorValues> &sensorsIn);
 
-  void getControl(std::map<std::string, ControlValues> &anglesOut);
+  void getControl(std::map<std::string, ControlValues> &anglesOut, const double& period);
 
   /// \todo this should go into the parent class, in sot-core package
   void setTimeStep (double dt)
