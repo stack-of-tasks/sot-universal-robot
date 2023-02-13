@@ -131,9 +131,9 @@ void SoTRobotArmController::cleanupSetSensors
 
 
 void SoTRobotArmController::getControl
-(map<string,ControlValues> &controlOut)
+(map<string,ControlValues> &controlOut, const double& period)
 {
-  device_->getControl(controlOut);
+  device_->getControl(controlOut, period);
 }
 
 void SoTRobotArmController::

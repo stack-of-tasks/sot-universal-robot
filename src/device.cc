@@ -208,13 +208,13 @@ void SoTRobotArmDevice::cleanupSetSensors(map<string, SensorValues>&
   setSensors (SensorsIn);
 }
 
-void SoTRobotArmDevice::getControl(map<string,ControlValues> &controlOut)
+void SoTRobotArmDevice::getControl(map<string,ControlValues> &controlOut, const double& period)
 {
   sotDEBUGIN(25) ;
   std::vector<double> anglesOut;
 
   // Integrate control
-  increment(timestep_);
+  increment(period);
   sotDEBUG (25) << "state = " << state_.transpose() << std::endl;
   previousState_ = state_;
 
