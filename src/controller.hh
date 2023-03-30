@@ -62,6 +62,12 @@ class SoTRobotArmController: public AbstractSotExternalInterface
   void setNoIntegration(void);
   void setSecondOrderIntegration(void);
 
+  // Set the number of joints that are controlled
+  virtual void setControlSize(const int& size);
+
+  // Run some python commands that cannot be run at construction
+  virtual void initializePython();
+
   /// Embedded python interpreter accessible via Corba/ros
   shared_ptr<dynamicgraph::Interpreter> interpreter_;
 
@@ -79,6 +85,8 @@ class SoTRobotArmController: public AbstractSotExternalInterface
   void init();
 
   SoTRobotArmDevice* device_;
+  // Whether python space has been fully initialized
+  bool pythonInitialized_;
 }; // class SoTRobotArmController
 
 #endif // SOT_UNIVERSAL_ROBOT_CONTROLLER_HH

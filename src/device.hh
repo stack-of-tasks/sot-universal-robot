@@ -58,8 +58,6 @@ public:
 
   void cleanupSetSensors(std::map<std::string, SensorValues> &sensorsIn);
 
-  void getControl(std::map<std::string, ControlValues> &anglesOut, const double& period);
-
   /// \todo this should go into the parent class, in sot-core package
   void setTimeStep (double dt)
   {
@@ -112,6 +110,10 @@ public:
   {
     signalRegistration(sinSIN << soutSOUT);
   }
+  void setInputSize(const int& size)
+  {
+    inputSize_ = size;
+  }
 private:
   dynamicgraph::Vector& compute(dynamicgraph::Vector& res, int time)
   {
@@ -121,6 +123,7 @@ private:
   }
   dynamicgraph::SignalPtr<dynamicgraph::Vector, int> sinSIN;
   dynamicgraph::SignalTimeDependent<dynamicgraph::Vector, int> soutSOUT;
+  int inputSize_;
 };
 
 #endif // SOT_UNIVERSAL_ROBOT_DEVICE_HH
