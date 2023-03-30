@@ -27,8 +27,7 @@
 import sys
 
 from .sot_robot_arm_device import DeviceRobotArm
-from . import Franka
-from . import UniversalRobot
+from .robot_arm import RobotArm
 
 if not hasattr(sys, 'argv'):
     sys.argv = [
@@ -37,16 +36,13 @@ if not hasattr(sys, 'argv'):
 
 print("Prologue RobotArm")
 
-RobotFactory = {'ur': UniversalRobot, 'franka': Franka}
-
 # Create the device.
 # This entity behaves exactly like robotsimu except:
 # 1. it does not provide the increment command
 # 2. it forwards the robot control to the sot-abstract
 #    controller.
 def makeRobot(robotType):
-    Robot = RobotFactory[robotType]
     # Create the robot using the device.
-    robot = Robot(name=robotType, device=DeviceRobotArm('RobotArm'))
+    robot = RobotArm(name=robotType, device=DeviceRobotArm('RobotArm'))
     return robot
 

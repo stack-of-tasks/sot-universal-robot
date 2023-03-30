@@ -64,7 +64,7 @@ void workThread(SoTRobotArmController *controller)
 }
 
 SoTRobotArmController::SoTRobotArmController():
-  device_(new SoTRobotArmDevice("RobotArm"))
+  device_(new SoTRobotArmDevice("RobotArm")), pythonInitialized_(false)
 {
   // Create thread and python interpreter
   init();
@@ -85,14 +85,14 @@ SoTRobotArmController::SoTRobotArmController():
 }
 
 SoTRobotArmController::SoTRobotArmController(std::string RobotName):
-  device_(new SoTRobotArmDevice (RobotName))
+  device_(new SoTRobotArmDevice (RobotName)), pythonInitialized_(false)
 {
   // Create thread and python interpreter
   init();
 }
 
 SoTRobotArmController::SoTRobotArmController(const char robotName[]):
-  device_(new SoTRobotArmDevice (robotName))
+  device_(new SoTRobotArmDevice (robotName)), pythonInitialized_(false)
 {
   // Create thread and python interpreter
   init();
@@ -110,10 +110,38 @@ SoTRobotArmController::~SoTRobotArmController()
 {
 }
 
+void SoTRobotArmController::setControlSize(const int& size)
+{
+  device_->setControlSize(size);
+}
+
+// Initialize the size of the signal plugged into device.control.
+// The size is not known when creating python interpreter. For this reason,
+// we need to run the following python lines later on.
+//
+// After calling this method,
+//   - the input velocity of the integrator is set to 0,
+//   - the output configuration of the integrator is computed for time 0,
+//     it contains the initial configuration of the robot as read from the joint
+//     encoders.
+void SoTRobotArmController::initializePython()
+{
+  std::ofstream aof(LOG_PYTHON.c_str(), std::ios::app);
+  runPython(aof,"robot.initializeEntities()", *interpreter_);
+  aof.close();
+}
+
+
 void SoTRobotArmController::setupSetSensors
 (map<string,SensorValues> &SensorsIn)
 {
   device_->setupSetSensors(SensorsIn);
+  // Finish initialization of python after reading the sensors to know the
+  // configuration of the robot.
+  if (!pythonInitialized_) {
+    initializePython();
+    pythonInitialized_ = true;
+  }
 }
 
 

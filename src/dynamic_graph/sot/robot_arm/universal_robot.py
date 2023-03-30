@@ -24,21 +24,10 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-from .robot_arm import RobotArm
+from dynamic_graph.sot.dynamic_pinocchio.robot import Robot
 
-class UniversalRobot(RobotArm):
+class UniversalRobot(Robot):
     """
     This class defines a robot of type UniversalRobot: UR3, UR5, UR10
     """
     defaultFilename = "package://sot_universal_robot/urdf/ur10.urdf"
-
-    def __init__(self, name, device=None, tracer=None, loadFromFile=False):
-        RobotArm.__init__(self, name, device, tracer, loadFromFile)
-
-    def setClosedLoop(self, closedLoop):
-        if closedLoop:
-            plug(self.device.robotState, self.dynamic.position)
-            self.device.setClosedLoop(True)
-        else:
-            plug(self.device.state, self.dynamic.position)
-            self.device.setClosedLoop(False)

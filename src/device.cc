@@ -84,17 +84,6 @@ SoTRobotArmDevice::SoTRobotArmDevice(std::string RobotName):
   dynamicgraph::Vector data (3); data.setZero ();
   using namespace dynamicgraph::command;
   std::string docstring;
-  /* Command increment. */
-  docstring =
-      "\n"
-      "    Integrate dynamics for time step provided as input\n"
-      "\n"
-      "      take one floating point number as input\n"
-      "\n";
-  addCommand("increment",
-             makeCommandVoid1((Device&)*this,
-                              &Device::increment, docstring));
-
   docstring =
       "    Set the integration in closed loop\n"
       "\n"
@@ -206,25 +195,6 @@ void SoTRobotArmDevice::cleanupSetSensors(map<string, SensorValues>&
 						SensorsIn)
 {
   setSensors (SensorsIn);
-}
-
-void SoTRobotArmDevice::getControl(map<string,ControlValues> &controlOut, const double& period)
-{
-  sotDEBUGIN(25) ;
-  std::vector<double> anglesOut;
-
-  // Integrate control
-  increment(period);
-  sotDEBUG (25) << "state = " << state_.transpose() << std::endl;
-  previousState_ = state_;
-
-  // Specify the joint values for the controller.
-  anglesOut.resize(state_.size());
-
-  for(unsigned int i=0; i < state_.size();++i)
-    anglesOut[i] = state_(i);
-  controlOut["control"].setValues(anglesOut);
-  sotDEBUGOUT(25) ;
 }
 
 void SoTRobotArmDevice::integrate(const double &dt)

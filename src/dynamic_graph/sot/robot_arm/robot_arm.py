@@ -25,55 +25,30 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+import numpy
 import pinocchio as se3
 from dynamic_graph import plug
-from dynamic_graph.sot.core.math_small_entities import Derivator_of_Vector
 from dynamic_graph.sot.dynamic_pinocchio.dynamic import DynamicPinocchio
-from dynamic_graph.sot.dynamic_pinocchio.humanoid_robot import AbstractRobot
+from dynamic_graph.sot.dynamic_pinocchio.robot import AbstractRobot
 import pinocchio
 
 class RobotArm(AbstractRobot):
     """
     This class defines an industrial robot arm
     """
+    # Index of the first actuated joint in the configuration vector
+    firstJointIndex = 0
+    def getActuatedJoints(self):
+        return range(0, self.device.getControlSize())
 
-    rosParamName = "/robot_description"
-    def __init__(self, name, device=None, tracer=None, loadFromFile=False):
-        self.OperationalPointsMap = None
-
-        if loadFromFile:
-            print("Loading from file " + self.defaultFilename)
-            self.loadModelFromUrdf(self.defaultFilename, rootJointType=None)
-        else:
-            print("Using ROS parameter \"/robot_description\"")
-            import rospy
-            if self.rosParamName not in rospy.get_param_names():
-                raise RuntimeError('"' + self.rosParamName +
-                                   '" is not a ROS parameter.')
-            s = rospy.get_param(self.rosParamName)
-            self.loadModelFromString(s, rootJointType=None)
-        AbstractRobot.__init__(self, name, tracer)
-
-        # Create rigid body dynamics model and data (pinocchio)
-        self.dynamic = DynamicPinocchio(self.name + "_dynamic")
-        self.dynamic.setModel(self.pinocchioModel)
-        self.dynamic.setData(self.pinocchioData)
-        self.dynamic.displayModel()
-        self.dimension = self.dynamic.getDimension()
-
-        self.device = device
-        self.initializeRobot()
-
-        # Create operational points based on operational points map
-        # (if provided)
-        if self.OperationalPointsMap is not None:
-            self.initializeOpPoints()
-
-    def defineHalfSitting(self, q):
-        pass
-
-    def _initialize(self):
-        AbstractRobot._initialize(self)
-        self.OperationalPoints.extend(['wrist', 'gaze'])
-
-__all__ = [RobotArm]
+    def initializeEntities(self):
+        # initialize size of some signals. The size is not known at construction
+        controlSize = self.device.getControlSize()
+        self.selector.selec(self.firstJointIndex, self.firstJointIndex +
+                             controlSize)
+        q = numpy.zeros(self.dynamic.getDimension())
+        q[0:controlSize] = self.device.signal("robotState").value
+        self.integrator.setInitialConfig(q)
+        self.integrator.signal("velocity").value = \
+            numpy.zeros(self.pinocchioModel.nv)
+        self.integrator.signal('configuration').recompute(0)
