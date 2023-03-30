@@ -38,10 +38,15 @@ class RobotArm(AbstractRobot):
     """
     # Index of the first actuated joint in the configuration vector
     firstJointIndex = 0
+    # List of indices corresponding to the actuated joints in pinocchio model
     def getActuatedJoints(self):
         return range(0, self.device.getControlSize())
 
+    # Initialization done when starting the controller. Cannot be done at
+    # construction since some values are not known yet.
     def initializeEntities(self):
+        # Always call parent implementation
+        AbstractRobot.initializeEntities(self)
         # initialize size of some signals. The size is not known at construction
         controlSize = self.device.getControlSize()
         self.selector.selec(self.firstJointIndex, self.firstJointIndex +
