@@ -81,19 +81,6 @@ SoTRobotArmDevice::SoTRobotArmDevice(std::string RobotName):
   timestep_ = TIMESTEP_DEFAULT;
   sotDEBUGIN(25) ;
   signalRegistration (p_gainsSOUT_ << d_gainsSOUT_);
-  dynamicgraph::Vector data (3); data.setZero ();
-  using namespace dynamicgraph::command;
-  std::string docstring;
-  docstring =
-      "    Set the integration in closed loop\n"
-      "\n"
-      "      - Input: boolean\n"
-      "\n";
-  addCommand("setClosedLoop",
-             makeCommandVoid1(*this,
-                              &SoTRobotArmDevice::setClosedLoop,
-			      docstring));
-  sotDEBUGOUT(25);
 }
 
 SoTRobotArmDevice::~SoTRobotArmDevice()
@@ -195,49 +182,6 @@ void SoTRobotArmDevice::cleanupSetSensors(map<string, SensorValues>&
 						SensorsIn)
 {
   setSensors (SensorsIn);
-}
-
-void SoTRobotArmDevice::integrate(const double &dt)
-{
-  using dynamicgraph::Vector;
-  const Vector &controlIN = controlSIN.accessCopy();
-
-  if (sanityCheck_ && controlIN.hasNaN()) {
-    dgRTLOG() << "Device::integrate: Control has NaN values: " << '\n'
-              << controlIN.transpose() << '\n';
-    return;
-  }
-
-  if (controlInputType_ == dynamicgraph::sot::CONTROL_INPUT_NO_INTEGRATION) {
-    state_ = controlIN;
-    return;
-  }
-
-  if (vel_control_.size() == 0)
-    vel_control_ = Vector::Zero(controlIN.size());
-
-  if (controlInputType_ == dynamicgraph::sot::CONTROL_INPUT_TWO_INTEGRATION) {
-    // TODO check acceleration
-    // Position increment
-    vel_control_ = velocity_ + (0.5 * dt) * controlIN;
-    // Velocity integration.
-    velocity_ += controlIN * dt;
-  } else {
-    vel_control_ = controlIN;
-  }
-
-  // Velocity bounds check
-  if (sanityCheck_) {
-    CHECK_BOUNDS(velocity_, lowerVelocity_, upperVelocity_, "velocity");
-  }
-
-  // Position integration
-  state_ += vel_control_ * dt;
-
-  // Position bounds check
-  if (sanityCheck_) {
-    CHECK_BOUNDS(state_, lowerPosition_, upperPosition_, "position");
-  }
 }
 
 DYNAMICGRAPH_FACTORY_ENTITY_PLUGIN(DeviceToDynamic, "DeviceToDynamic");
