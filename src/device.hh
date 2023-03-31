@@ -71,9 +71,6 @@ protected:
     closedLoop_ = closedLoop;
   };
 
-  /// Integrate control signal to update internal state.
-  virtual void integrate(const double &dt);
-
   /// \brief Whether the control of the base should be expressed in odometry
   ///        frame of base frame.
   bool closedLoop_;
