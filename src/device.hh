@@ -39,6 +39,7 @@ using dynamicgraph::sot::SensorValues;
 class SoTRobotArmDevice : public dynamicgraph::sot::Device
 {
 public:
+  typedef dynamicgraph::sigtime_t sigtime_t;
   static const std::string CLASS_NAME;
   static const double TIMESTEP_DEFAULT;
 
@@ -79,9 +80,9 @@ protected:
   dynamicgraph::Vector previousState_;
 
   /// proportional and derivative position-control gains
-  dynamicgraph::Signal <dynamicgraph::Vector, int> p_gainsSOUT_;
+  dynamicgraph::Signal <dynamicgraph::Vector, sigtime_t> p_gainsSOUT_;
 
-  dynamicgraph::Signal <dynamicgraph::Vector, int> d_gainsSOUT_;
+  dynamicgraph::Signal <dynamicgraph::Vector, sigtime_t> d_gainsSOUT_;
 
   /// Intermediate variables to avoid allocation during control
   dynamicgraph::Vector dgforces_;
@@ -99,6 +100,7 @@ protected:
 class DeviceToDynamic : public dynamicgraph::Entity
 {
 public:
+  typedef dynamicgraph::sigtime_t sigtime_t;
   static const std::string CLASS_NAME;
   DeviceToDynamic(const std::string& name) :
     dynamicgraph::Entity(name), sinSIN(0x0, "DeviceToDynamic("+name+")::input(vector)::sin"),
@@ -112,14 +114,14 @@ public:
     inputSize_ = size;
   }
 private:
-  dynamicgraph::Vector& compute(dynamicgraph::Vector& res, int time)
+  dynamicgraph::Vector& compute(dynamicgraph::Vector& res, sigtime_t time)
   {
     res.head<7>() = sinSIN(time);
     res[7] = 0;
     return res;
   }
-  dynamicgraph::SignalPtr<dynamicgraph::Vector, int> sinSIN;
-  dynamicgraph::SignalTimeDependent<dynamicgraph::Vector, int> soutSOUT;
+  dynamicgraph::SignalPtr<dynamicgraph::Vector, sigtime_t> sinSIN;
+  dynamicgraph::SignalTimeDependent<dynamicgraph::Vector, sigtime_t> soutSOUT;
   int inputSize_;
 };
 
