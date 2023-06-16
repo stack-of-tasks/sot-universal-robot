@@ -90,7 +90,7 @@ void SoTRobotArmDevice::setSensors(map<string,SensorValues> &SensorsIn)
 {
   sotDEBUGIN(25) ;
   map<string,SensorValues>::iterator it;
-  int t = stateSOUT.getTime () + 1;
+  sigtime_t t = stateSOUT.getTime () + 1;
   bool setRobotState = false;
 
   it = SensorsIn.find("forces");
