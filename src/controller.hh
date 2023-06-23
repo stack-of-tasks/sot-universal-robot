@@ -38,7 +38,7 @@ using dynamicgraph::sot::AbstractSotExternalInterface;
 using dynamicgraph::sot::Device;
 using dynamicgraph::sot::ControlValues;
 using dynamicgraph::sot::SensorValues;
-
+using dynamicgraph::size_type;
 
 class SoTRobotArmController: public AbstractSotExternalInterface
 {
@@ -63,7 +63,7 @@ class SoTRobotArmController: public AbstractSotExternalInterface
   void setSecondOrderIntegration(void);
 
   // Set the number of joints that are controlled
-  virtual void setControlSize(const int& size);
+  virtual void setControlSize(const size_type& size);
 
   // Run some python commands that cannot be run at construction
   virtual void initializePython();
