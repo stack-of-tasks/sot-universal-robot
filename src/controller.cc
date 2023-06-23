@@ -110,7 +110,7 @@ SoTRobotArmController::~SoTRobotArmController()
 {
 }
 
-void SoTRobotArmController::setControlSize(const int& size)
+void SoTRobotArmController::setControlSize(const size_type& size)
 {
   device_->setControlSize(size);
 }
